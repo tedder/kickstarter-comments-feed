@@ -17,8 +17,8 @@ SCRUBBED_PROJECT_URL = re.sub(r"[^a-zA-Z\-_0-9]", "-", PROJECT_URL)
 def parse_comment(comment_container, pageurl):
   # this show match the JSON feed spec for a single item.
   ret = {
-    'id': pageurl + comment_container.get('id'),
-    'url': pageurl + comment_container.get('id')
+    'id': pageurl + '#' + comment_container.get('id'),
+    'url': pageurl + '#' + comment_container.get('id')
   }
   comment_author = comment_container.xpath("div[contains(@class, 'comment-inner')]/div/h3/a[contains(@class, 'author')]")
 
