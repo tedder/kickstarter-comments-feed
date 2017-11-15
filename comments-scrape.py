@@ -73,7 +73,7 @@ def write_json_feed(comments, pageurl, comment_url_snippet):
     ContentType='application/json',
     CacheControl='public, max-age=30' # todo: 3600
   )
-  print("updated: {}".format(feed_url))
+  #print("updated: {}".format(feed_url))
 
 
 r = requests.get(COMMENTS_PAGE_URL)
