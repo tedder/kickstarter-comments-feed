@@ -32,7 +32,8 @@ def parse_comment(comment_container, pageurl):
 
   comment_date = comment_container.xpath("div[contains(@class, 'comment-inner')]/div/h3/span/a/data")
   if len(comment_date) == 1:
-    ret['date_published'] = comment_date[0].get('data-value')
+    # surrounded by quotes, which lxml doesn't remove
+    ret['date_published'] = comment_date[0].get('data-value').replace('"', '')
   else:
     raise Exception("unexpected number of comment date returns: " + str(comment_date))
 
@@ -54,7 +55,7 @@ def write_json_feed(comments, pageurl, comment_url_snippet):
   feed_url = 'https://dyn.tedder.me/' + s3_key
   feedj = {
     'version': 'https://jsonfeed.org/version/1',
-    'user_comment': "parsed from Kickstarter because I was tired of refreshing comments pages. Documentation/intro should be on Medium, also a github link should be here. It isn't generified- this is just the first pass.",
+    'user_comment': "parsed from Kickstarter because I was tired of refreshing comments pages. Documentation/intro should be on Medium, also <https://github.com/tedder/kickstarter-comments-feed/>. It isn't generified- this is just the first pass.",
     'title': 'BuildOne comments / scraped from Kickstarter',
     'home_page_url': pageurl,
     'feed_url': feed_url,
@@ -70,7 +71,7 @@ def write_json_feed(comments, pageurl, comment_url_snippet):
     Bucket='dyn.tedder.me',
     Key=s3_key,
     ContentType='application/json',
-    CacheControl='public, max-age=3600'
+    CacheControl='public, max-age=30' # todo: 3600
   )
   print("updated: {}".format(feed_url))
 
