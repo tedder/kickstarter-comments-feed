@@ -10,9 +10,10 @@ import re
 
 # using the JSON feed spec: https://jsonfeed.org/version/1
 
-PROJECT_URL = "robotic-industries/buildone-99-3d-printer-w-wifi-and-auto-bed-levelin"
-COMMENTS_PAGE_URL = "https://www.kickstarter.com/projects/" + PROJECT_URL + "/comments"
-SCRUBBED_PROJECT_URL = re.sub(r"[^a-zA-Z\-_0-9]", "-", PROJECT_URL)
+PROJECT_URLS = [
+  "robotic-industries/buildone-99-3d-printer-w-wifi-and-auto-bed-levelin",
+  "memistore/memistore-store-your-extra-memory-cards-and-images",
+]
 
 def parse_comment(comment_container, pageurl):
   # this show match the JSON feed spec for a single item.
@@ -76,19 +77,23 @@ def write_json_feed(comments, pageurl, comment_url_snippet):
   #print("updated: {}".format(feed_url))
 
 
-r = requests.get(COMMENTS_PAGE_URL)
-#print(COMMENTS_PAGE_URL)
-comments_text = r.text
-tree = lxml.html.fromstring(comments_text)
-#print(comments_text)
+def parse_project(comment_page_url, project_url):
+  r = requests.get(comment_page_url)
+  comments_text = r.text
+  tree = lxml.html.fromstring(comments_text)
+  #print(comments_text)
 
-comments_ret = []
-comments_container = tree.xpath("//ol[contains(@class, 'comments')]/li[contains(@class, 'comment')]")
-#print(comments_container)
+  comments_ret = []
+  comments_container = tree.xpath("//ol[contains(@class, 'comments')]/li[contains(@class, 'comment')]")
+  #print(comments_container)
 
-for comment_container in comments_container:
-  #print("pc")
-  comments_ret.append(parse_comment(comment_container, COMMENTS_PAGE_URL))
+  for comment_container in comments_container:
+    #print("pc")
+    comments_ret.append(parse_comment(comment_container, comment_page_url))
 
-write_json_feed(comments_ret, COMMENTS_PAGE_URL, SCRUBBED_PROJECT_URL)
+  scrubbed_url = re.sub(r"[^a-zA-Z\-_0-9]", "-", project_url)
+  write_json_feed(comments_ret, comment_page_url, scrubbed_url)
 
+for u in PROJECT_URLS:
+  c_u = "https://www.kickstarter.com/projects/" + u + "/comments"
+  parse_project(c_u, u)
