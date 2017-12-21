@@ -13,6 +13,7 @@ import re
 PROJECT_URLS = [
   "robotic-industries/buildone-99-3d-printer-w-wifi-and-auto-bed-levelin",
   "memistore/memistore-store-your-extra-memory-cards-and-images",
+  "makerspot/raspberry-pi-zero-docking-hub",
 ]
 
 def parse_comment(comment_container, pageurl):
