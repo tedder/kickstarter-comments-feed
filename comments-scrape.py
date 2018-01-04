@@ -10,11 +10,11 @@ import re
 
 # using the JSON feed spec: https://jsonfeed.org/version/1
 
-PROJECT_URLS = [
-  "robotic-industries/buildone-99-3d-printer-w-wifi-and-auto-bed-levelin",
-  "memistore/memistore-store-your-extra-memory-cards-and-images",
-  "makerspot/raspberry-pi-zero-docking-hub",
-]
+PROJECT_URLS = {
+  "BuildOne": "robotic-industries/buildone-99-3d-printer-w-wifi-and-auto-bed-levelin",
+  "Memistore": "memistore/memistore-store-your-extra-memory-cards-and-images",
+  "Pi Zero Docking Hub": "makerspot/raspberry-pi-zero-docking-hub",
+}
 
 def parse_comment(comment_container, pageurl):
   # this show match the JSON feed spec for a single item.
@@ -52,13 +52,13 @@ def parse_comment(comment_container, pageurl):
 
   return ret
 
-def write_json_feed(comments, pageurl, comment_url_snippet):
+def write_json_feed(comments, pageurl, comment_url_snippet, project_title):
   s3_key = 'rss/ks/comments/' + comment_url_snippet + '.json'
   feed_url = 'https://dyn.tedder.me/' + s3_key
   feedj = {
     'version': 'https://jsonfeed.org/version/1',
-    'user_comment': "parsed from Kickstarter because I was tired of refreshing comments pages. Documentation/intro should be on Medium, also <https://github.com/tedder/kickstarter-comments-feed/>. It isn't generified- this is just the first pass.",
-    'title': 'BuildOne comments / scraped from Kickstarter',
+    'user_comment': "parsed from Kickstarter because I was tired of refreshing comments pages. Documentation/intro on Medium, also <https://github.com/tedder/kickstarter-comments-feed/>.",
+    'title': '{} comments / scraped from Kickstarter'.format(project_title),
     'home_page_url': pageurl,
     'feed_url': feed_url,
     'author': { 'name': 'tedder', 'url': 'https://tedder.me' },
@@ -78,7 +78,7 @@ def write_json_feed(comments, pageurl, comment_url_snippet):
   #print("updated: {}".format(feed_url))
 
 
-def parse_project(comment_page_url, project_url):
+def parse_project(comment_page_url, project_url, project_title):
   r = requests.get(comment_page_url)
   comments_text = r.text
   tree = lxml.html.fromstring(comments_text)
@@ -93,8 +93,8 @@ def parse_project(comment_page_url, project_url):
     comments_ret.append(parse_comment(comment_container, comment_page_url))
 
   scrubbed_url = re.sub(r"[^a-zA-Z\-_0-9]", "-", project_url)
-  write_json_feed(comments_ret, comment_page_url, scrubbed_url)
+  write_json_feed(comments_ret, comment_page_url, scrubbed_url, project_title)
 
-for u in PROJECT_URLS:
+for title,u in PROJECT_URLS.items():
   c_u = "https://www.kickstarter.com/projects/" + u + "/comments"
-  parse_project(c_u, u)
+  parse_project(c_u, u, title)
