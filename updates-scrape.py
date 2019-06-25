@@ -21,8 +21,8 @@ def parse_update_page(update_page_url):
   tree = lxml.html.fromstring(update_page_text)
 
   page_ret = []
-  with open('/tmp/ks.txt', 'w') as f:
-    f.write(update_page_text)
+  with open('/tmp/ks.txt', 'wb') as f:
+    f.write(update_page_text.encode('utf8'))
   #update_text = tree.xpath("//div[contains(@class, 'project_post_summary')]")
   #update_text = tree.xpath("//div[contains(concat(' ', normalize-space(@class), ' '), ' body ')]/*")
   update_text = tree.xpath("//div[contains(@class, 'body')]")
