@@ -9,11 +9,19 @@ import lxml.html
 import re
 
 # using the JSON feed spec: https://jsonfeed.org/version/1
+# s3 location: dyn.tedder.me/rss/ks/comments/
 
 PROJECT_URLS = {
   "BuildOne": "robotic-industries/buildone-99-3d-printer-w-wifi-and-auto-bed-levelin",
   "Memistore": "memistore/memistore-store-your-extra-memory-cards-and-images",
   "Pi Zero Docking Hub": "makerspot/raspberry-pi-zero-docking-hub",
+  "RePLAy 3D Filament and Recycling Program Pre-Sale!": "1239295865/replay-3d-filament-and-recycling-program-pre-sale",
+  "Maker UNO": "1685732347/6-maker-uno-simplifying-arduino-for-education",
+  "Easy Peelzy": "1011650524/easy-peelzy",
+  "ZiFlex": "1856422226/ziflex-flexible-and-magnetic-build-platform-for-3d",
+  "amplify aptx headphone amplifier": "auris/amplify-the-ultimate-wireless-headphone-amplifier",
+  "3dp professor low-poly dinosaurs": "3dpprofessor/low-poly-dinos-dinosaur-3d-models-by-3d-printing-p",
+  "Huell Howser's greatest hits": "kcet/bring-back-huells-greatest-hits",
 }
 
 def parse_comment(comment_container, pageurl):
@@ -36,8 +44,11 @@ def parse_comment(comment_container, pageurl):
   if len(comment_date) == 1:
     # surrounded by quotes, which lxml doesn't remove
     ret['date_published'] = comment_date[0].get('data-value').replace('"', '')
+  elif len(comment_date) == 0: # this happens sometimes
+    pass
   else:
-    raise Exception("unexpected number of comment date returns: " + str(comment_date))
+    raise Exception("unexpected number of comment date returns: {}, cid: {}, url: {}".format(str(comment_date), comment_container.get('id'), pageurl))
+
 
   comment_text = comment_container.xpath("div[contains(@class, 'comment-inner')]/div/p")
   if len(comment_text) == 0:
